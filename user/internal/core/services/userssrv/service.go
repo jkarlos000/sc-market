@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"github.com/jkarlos000/sc-market/user/internal/core/domain"
 	"github.com/jkarlos000/sc-market/user/internal/core/ports"
-
-	"github.com/jkarlos000/srp6"
+	srp "github.com/jkarlos000/srp6"
 )
 
 type service struct {
@@ -44,34 +43,13 @@ func (s *service) Deletes(id []int) error {
 		}
 	}
 	return nil
-
 }
 
 func (s *service) Update(id int, user *domain.User) error {
 	return s.repo.Update(id, user)
 }
 
-func (s *service) Ban(id int) error {
-	user, err := s.repo.Get(id)
-	if err != nil {
-		return err
-	}
-	locked := true
-	user.Locked = &locked
-	return s.repo.Update(id, user)
-}
-
-func (s *service) UnBan(id int) error {
-	user, err := s.repo.Get(id)
-	if err != nil {
-		return err
-	}
-	unlocked := false
-	user.Locked = &unlocked
-	return s.repo.Update(id, user)
-}
-
-func (s*service) Login(email, password string) (bool, *domain.User, error) {
+func (s *service) Login(email, password string) (bool, *domain.User, error) {
 	user, err := s.repo.GetByEmail(email)
 	if err != nil {
 		return false, nil, err
@@ -85,3 +63,24 @@ func (s*service) Login(email, password string) (bool, *domain.User, error) {
 	}
 	return true, user, nil
 }
+
+func (s *service) Ban(id int) error {
+	user, err := s.repo.Get(id)
+	if err != nil {
+		return err
+	}
+	locked := true
+	user.Locked = &locked
+	return s.repo.Update(id, user)
+}
+
+func (s *service) Unban(id int) error {
+	user, err := s.repo.Get(id)
+	if err != nil {
+		return err
+	}
+	unlocked := false
+	user.Locked = &unlocked
+	return s.repo.Update(id, user)
+}
+

@@ -1,0 +1,74 @@
+syntax = "proto3";
+package user;
+
+option go_package = "user/internal/infrastructure/delivery/grpc/proto";
+
+message User {
+  uint32 ID = 1;
+  string Email = 2;
+  string Names = 3;
+  string LastNames = 4;
+  string BirthDate = 5;
+  string Gender = 6;
+  string Address = 7;
+  string Reference = 8;
+  string CI = 9;
+  string Telephone = 10;
+  string LastIP = 11;
+  bool Locked = 12;
+}
+
+message IdRequest {
+  uint32 id = 1;
+}
+
+message IdsRequest {
+  repeated uint32 ids = 1;
+}
+
+message UserResponse {
+  User user = 1;
+}
+
+message UserRequest {
+  User user = 1;
+}
+
+message MessageResponse{
+  string message = 1;
+}
+
+message UserNilRequest {
+
+}
+
+message UsersResponse {
+  repeated User users = 1;
+}
+
+message UpdateRequest {
+  uint32 id = 1;
+  User user = 2;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  bool ok = 1;
+  User user = 2;
+}
+
+service UserService {
+  rpc Get(IdRequest) returns (UserResponse){};
+  rpc Create(UserRequest) returns (MessageResponse){};
+  rpc List(UserNilRequest) returns (UsersResponse){};
+  rpc Delete(IdRequest) returns (MessageResponse){};
+  rpc Deletes(IdsRequest) returns (MessageResponse){};
+  rpc Update(UpdateRequest) returns (MessageResponse){};
+  rpc Login(LoginRequest) returns (LoginResponse){};
+  rpc Ban(IdRequest) returns (MessageResponse){};
+  rpc Unban(IdRequest) returns (MessageResponse){};
+}

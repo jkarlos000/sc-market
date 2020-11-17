@@ -2,8 +2,6 @@ package domain
 
 import (
 	"database/sql"
-	"time"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -15,7 +13,7 @@ type User struct {
 	SessionKeyAuth	string
 	Names	string
 	LastNames	string
-	BirdDate	string
+	BirthDate	string
 	Gender	string
 	Address	string
 	Reference	string
@@ -24,5 +22,5 @@ type User struct {
 	JoinDate	sql.NullTime
 	LastIP	string
 	Locked	*bool	`gorm:"default:false"`
-	LastLogin	time.Time
+	LastLogin	string
 }
