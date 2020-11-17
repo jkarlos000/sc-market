@@ -3,24 +3,31 @@ package gorm
 import (
 	"errors"
 	"fmt"
+	"github.com/hashicorp/go-hclog"
 	"github.com/jinzhu/gorm"
 	"github.com/jkarlos000/sc-market/user/internal/core/domain"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"log"
 )
 
 type repository struct{
 	DBConn *gorm.DB
 }
 
-func NewUsersRepository() *repository {
-	var repo *repository
+func NewUsersRepository(ip, user, password, dbname, tmz string, port int) *repository {
+	var repo repository
 	var err error
-	repo.DBConn, err = gorm.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=%s", "localhost", 5432, "usersvc", "m7TDiQqO7kb3aEY2", "erp_user", "America/La_Paz"))
+	logger := hclog.Default()
+	repo.DBConn, err = gorm.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=%s", ip, port, user, password, dbname, tmz))
 
 	if err != nil {
+		logger.Error("Error interno en la base de datos", "err", err)
+		log.Printf("Error with: %v\n", err)
 		panic("failed to connect database")
 	}
+	logger.Info("Migrando modelo hacia la base de datos")
 	repo.DBConn.AutoMigrate(domain.User{})
-	return repo
+	return &repo
 }
 
 func (r *repository) Get(id int) (*domain.User, error) {

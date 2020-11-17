@@ -30,8 +30,9 @@ message UserResponse {
   User user = 1;
 }
 
-message UserRequest {
+message CreateRequest {
   User user = 1;
+  string password = 2;
 }
 
 message MessageResponse{
@@ -63,7 +64,7 @@ message LoginResponse {
 
 service UserService {
   rpc Get(IdRequest) returns (UserResponse){};
-  rpc Create(UserRequest) returns (MessageResponse){};
+  rpc Create(CreateRequest) returns (MessageResponse){};
   rpc List(UserNilRequest) returns (UsersResponse){};
   rpc Delete(IdRequest) returns (MessageResponse){};
   rpc Deletes(IdsRequest) returns (MessageResponse){};

@@ -22,7 +22,13 @@ func (s *service) Get(id int) (*domain.User, error) {
 	return s.repo.Get(id)
 }
 
-func (s *service) Create(user *domain.User) error {
+func (s *service) Create(user *domain.User, password string) error {
+	auth := srp.New()
+	auth.GenerateSalt()
+	hash := srp.Hash(user.Email, password)
+	auth.ComputeVerifier(hash)
+	user.Salt = auth.GetSalt()
+	user.Verify = auth.GetVerifier()
 	return s.repo.Save(user)
 }
 
@@ -60,6 +66,9 @@ func (s *service) Login(email, password string) (bool, *domain.User, error) {
 	auth.ComputeVerifier(identifier)
 	if !auth.ProofVerifier(user.Verify) {
 		return false, nil, errors.New("La contraseña es incorrecta")
+	}
+	if *user.Locked == true {
+		return false, nil, errors.New("La cuenta se encuentra bloqueada, contacte con el administrador")
 	}
 	return true, user, nil
 }

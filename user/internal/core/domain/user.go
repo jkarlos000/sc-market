@@ -2,11 +2,11 @@ package domain
 
 import (
 	"database/sql"
-	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type User struct {
-	gorm.Model
+	ID        uint `gorm:"primary_key"`
 	Email	string	`gorm:"unique;not null"`
 	Salt	string
 	Verify	string
@@ -23,4 +23,7 @@ type User struct {
 	LastIP	string
 	Locked	*bool	`gorm:"default:false"`
 	LastLogin	string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time `sql:"index"`
 }
