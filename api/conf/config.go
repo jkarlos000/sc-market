@@ -9,7 +9,7 @@ import (
 
 func Config(key string) string {
 	l := hclog.Default()
-	err := godotenv.Load(".env")
+	err := godotenv.Load("./env")
 	if err != nil {
 		l.Error("Config Falla al cargar configuración", "error", err)
 	}

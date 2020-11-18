@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/jkarlos000/sc-market/api/conf"
 	"github.com/jkarlos000/sc-market/client/cmd/client"
-	proto "github.com/jkarlos000/sc-market/client/internal/infrastructure/delivery/grpc/proto"
+
 	"google.golang.org/grpc"
 	"time"
 )
@@ -35,9 +35,9 @@ func NewLogin() *login {
 }
 
 func (lh *login) SetupRoutes(router fiber.Router)  {
-	router.Post("/clientes")
-	router.Post("/usuarios")
-	router.Post("/proveedores")
+	router.Post("/clientes", lh.loginClient)
+	//router.Post("/usuarios")
+	//router.Post("/proveedores")
 }
 
 func (lh *login) loginClient(c *fiber.Ctx)  {
@@ -52,8 +52,7 @@ func (lh *login) loginClient(c *fiber.Ctx)  {
 		lh.l.Error("Login: No se pudo conectar al servicio de Cliente", "error", errDial)
 	}
 	defer cc.Close()
-	clientGrpc := proto.NewClientServiceClient(cc)
-	connection := client.NewClientCli(clientGrpc)
+	connection := client.NewClientCli(cc)
 	_, user, errLogin := connection.Login(login.Email, login.Password)
 	if errLogin != nil {
 		lh.l.Error("Login: Datos incorrectos", "error", errLogin)
