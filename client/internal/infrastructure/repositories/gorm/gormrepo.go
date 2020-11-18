@@ -14,11 +14,11 @@ type repository struct{
 	DBConn *gorm.DB
 }
 
-func NewClientsRepository(ip, client, password, dbname, tmz string, port int) *repository {
+func NewClientsRepository(ip, user, password, dbname, tmz string, port int) *repository {
 	var repo repository
 	var err error
 	logger := hclog.Default()
-	repo.DBConn, err = gorm.Open("postgres", fmt.Sprintf("host=%s port=%d client=%s password=%s dbname=%s sslmode=disable TimeZone=%s", ip, port, client, password, dbname, tmz))
+	repo.DBConn, err = gorm.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=%s", ip, port, user, password, dbname, tmz))
 
 	if err != nil {
 		logger.Error("Error interno en la base de datos", "err", err)
