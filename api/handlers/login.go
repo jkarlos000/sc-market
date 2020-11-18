@@ -35,9 +35,9 @@ func NewLogin() *login {
 }
 
 func (lh *login) SetupRoutes(router fiber.Router)  {
-	router.Post("/clientes", lh.loginClient)
-	//router.Post("/usuarios")
-	//router.Post("/proveedores")
+	router.Post("/cliente", lh.loginClient)
+	//router.Post("/usuario")
+	//router.Post("/proveedor")
 }
 
 func (lh *login) loginClient(c *fiber.Ctx)  {

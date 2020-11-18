@@ -31,21 +31,21 @@ func NewClientsRepository(ip, user, password, dbname, tmz string, port int) *rep
 }
 
 func (r *repository) Get(id int) (*domain.Client, error) {
-	var client *domain.Client
-	cliente := r.DBConn.First(client, id )
+	var client domain.Client
+	cliente := r.DBConn.Find(&client, id )
 	if cliente.RecordNotFound() {
 		return nil, errors.New("Cliente no encontrado")
 	}
-	return client, nil
+	return &client, nil
 }
 
 func (r *repository) GetByEmail(email string) (*domain.Client, error) {
-	var client *domain.Client
-	cliente := r.DBConn.First(client, &domain.Client{Email: email} )
+	var client domain.Client
+	cliente := r.DBConn.Find(&client, &domain.Client{Email: email} )
 	if cliente.RecordNotFound() {
 		return nil, errors.New("Email no registrado.")
 	}
-	return client, nil
+	return &client, nil
 }
 
 func (r *repository) List() ([]*domain.Client, error) {

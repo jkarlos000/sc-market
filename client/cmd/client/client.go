@@ -150,7 +150,7 @@ func (cc *ClientCli) UpdateClient(id int, client *domain.Client) error {
 	return nil
 }
 
-func (cc *ClientCli) Login(email, password string) (bool, *domain.Client, error) {
+func (cc *ClientCli) Login(email, password string) (bool, domain.Client, error) {
 	req := &proto.LoginRequest{
 		Email:    email,
 		Password: password,
@@ -158,9 +158,9 @@ func (cc *ClientCli) Login(email, password string) (bool, *domain.Client, error)
 	resp, err := cc.client.Login(context.Background(), req)
 	if err != nil {
 		cc.logger.Error("Ha ocurrido un error con el Login", "err", err)
-		return false, nil, err
+		return false, domain.Client{}, err
 	}
-	return resp.GetOk(), cc.parseToClient(resp.GetClient()), nil
+	return resp.GetOk(), *cc.parseToClient(resp.GetClient()), nil
 }
 
 func (cc *ClientCli) BanClient(id int) error {
