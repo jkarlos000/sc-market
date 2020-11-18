@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/jkarlos000/sc-market/user/internal/core/domain"
 	"github.com/jkarlos000/sc-market/user/internal/infrastructure/delivery/grpc/proto"
+	"google.golang.org/grpc"
 )
 
 type UserClient	struct {
@@ -13,13 +14,14 @@ type UserClient	struct {
 	logger	hclog.Logger
 }
 
-func NewUserClient(c proto.UserServiceClient) *UserClient {
+func NewUserClient(c *grpc.ClientConn) *UserClient {
+	cc := proto.NewUserServiceClient(c)
 	appLogger := hclog.New(&hclog.LoggerOptions{
 		Name:  "UserClient",
 		Level: hclog.LevelFromString("DEBUG"),
 	})
 	return &UserClient{
-		client: c,
+		client: cc,
 		logger: appLogger,
 	}
 }

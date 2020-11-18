@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/jkarlos000/sc-market/provider/internal/core/domain"
 	"github.com/jkarlos000/sc-market/provider/internal/infrastructure/delivery/grpc/proto"
+	"google.golang.org/grpc"
 )
 
 type ProviderClient	struct {
@@ -13,13 +14,14 @@ client proto.ProviderServiceClient
 logger	hclog.Logger
 }
 
-func NewProviderClient(c proto.ProviderServiceClient) *ProviderClient {
+func NewProviderClient(c *grpc.ClientConn) *ProviderClient {
+	cc := proto.NewProviderServiceClient(c)
 	appLogger := hclog.New(&hclog.LoggerOptions{
 		Name:  "ProviderClient",
 		Level: hclog.LevelFromString("DEBUG"),
 	})
 	return &ProviderClient{
-		client: c,
+		client: cc,
 		logger: appLogger,
 	}
 }
