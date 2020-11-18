@@ -5,10 +5,13 @@ import (
 	"github.com/jkarlos000/sc-market/user/internal/infrastructure/delivery/grpc/proto"
 	"github.com/jkarlos000/sc-market/user/internal/infrastructure/repositories/gorm"
 	"github.com/jkarlos000/sc-market/user/internal/infrastructure/server"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"github.com/hashicorp/go-hclog"
 	"log"
 	"net"
+	"strconv"
+	"os"
 )
 
 type Logger struct {
@@ -18,13 +21,14 @@ type Logger struct {
 func main() {
 	//opts := grpc.WithInsecure()
 	logger := hclog.Default()
-	logger.Info("Iniciando servicio en puerto 5001")
-	lis, err := net.Listen("tcp", ":5001")
+	logger.Info("Iniciando servicio en puerto "+Config("APP_PORT"))
+	lis, err := net.Listen("tcp", ":"+Config("APP_PORT"))
 	if err != nil {
 		log.Fatalf("Failed to listen on %v", err)
 	}
 	logger.Info("Configurando servicios...")
-	repository := gorm.NewUsersRepository("localhost", "usersvc", "m7TDiQqO7kb3aEY2", "erp_user", "America/La_Paz", 5432)
+	portdb, _ := strconv.ParseUint(Config("DB_PORT"), 10, 32)
+	repository := gorm.NewUsersRepository(Config("DB_HOST"), Config("DB_USER"), Config("DB_PASSWORD"), Config("DB_NAME"), Config("DB_TIMEZONE"), int(portdb))
 	service := userssrv.NewService(repository)
 	srv := server.NewServer(service, logger)
 	gserver := grpc.NewServer()
@@ -33,4 +37,13 @@ func main() {
 	if err := gserver.Serve(lis); err != nil {
 		log.Fatalf("failed to server %v", err)
 	}
+}
+
+func Config(key string) string {
+	l := hclog.Default()
+	err := godotenv.Load(".env")
+	if err != nil {
+		l.Error("Config Falla al cargar configuración", "error", err)
+	}
+	return os.Getenv(key)
 }

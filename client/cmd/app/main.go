@@ -1,13 +1,16 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	"net"
+	"os"
 	"google.golang.org/grpc"
 	"github.com/hashicorp/go-hclog"
 	"github.com/jkarlos000/sc-market/client/internal/infrastructure/server"
 	"github.com/jkarlos000/sc-market/client/internal/core/services/clientssrv"
 	"github.com/jkarlos000/sc-market/client/internal/infrastructure/repositories/gorm"
 	"github.com/jkarlos000/sc-market/client/internal/infrastructure/delivery/grpc/proto"
+	"strconv"
 )
 
 type Logger struct {
@@ -17,13 +20,14 @@ type Logger struct {
 func main() {
 	//opts := grpc.WithInsecure()
 	logger := hclog.Default()
-	logger.Info("Iniciando servicio en puerto 5011")
-	lis, err := net.Listen("tcp", ":5011")
+	logger.Info("Iniciando servicio en puerto "+Config("APP_PORT"))
+	lis, err := net.Listen("tcp", ":"+Config("APP_PORT"))
 	if err != nil {
 		logger.Error("Failed to listen","error", err)
 	}
 	logger.Info("Configurando servicios...")
-	repository := gorm.NewClientsRepository("localhost", "clientsvc", "UJd2XhJ0XDQWgngc", "erp_client", "America/La_Paz", 5432)
+	portdb, _ := strconv.ParseUint(Config("DB_PORT"), 10, 32)
+	repository := gorm.NewClientsRepository(Config("DB_HOST"), Config("DB_USER"), Config("DB_PASSWORD"), Config("DB_NAME"), Config("DB_TIMEZONE"), int(portdb))
 	service := clientssrv.NewService(repository)
 	srv := server.NewServer(service, logger)
 	gserver := grpc.NewServer()
@@ -32,4 +36,13 @@ func main() {
 	if err := gserver.Serve(lis); err != nil {
 		logger.Error("Failed to server","error", err)
 	}
+}
+
+func Config(key string) string {
+	l := hclog.Default()
+	err := godotenv.Load(".env")
+	if err != nil {
+		l.Error("Config Falla al cargar configuración", "error", err)
+	}
+	return os.Getenv(key)
 }
