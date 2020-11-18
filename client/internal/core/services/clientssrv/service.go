@@ -45,7 +45,7 @@ func (s *service) Deletes(id []int) error {
 		err := s.repo.Delete(ClientId)
 		if err != nil {
 			// Requiere LOG
-			return fmt.Errorf("Ha ocurrido un error al eliminar los usuarios. Referencia: %v", err)
+			return fmt.Errorf("Ha ocurrido un error al eliminar los clientes. Referencia: %v", err)
 		}
 	}
 	return nil

@@ -3,11 +3,11 @@ package gorm
 import (
 	"errors"
 	"fmt"
-	"github.com/jkarlos000/sc-market/client/internal/core/domain"
-
 	"github.com/hashicorp/go-hclog"
 	"github.com/jinzhu/gorm"
+	"github.com/jkarlos000/sc-market/client/internal/core/domain"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"log"
 )
 
 type repository struct{
@@ -22,6 +22,7 @@ func NewClientsRepository(ip, user, password, dbname, tmz string, port int) *rep
 
 	if err != nil {
 		logger.Error("Error interno en la base de datos", "err", err)
+		log.Printf("Error with: %v\n", err)
 		panic("failed to connect database")
 	}
 	logger.Info("Migrando modelo hacia la base de datos")
@@ -33,7 +34,7 @@ func (r *repository) Get(id int) (*domain.Client, error) {
 	var client *domain.Client
 	cliente := r.DBConn.First(client, id )
 	if cliente.RecordNotFound() {
-		return nil, errors.New("Usuario no encontrado")
+		return nil, errors.New("Cliente no encontrado")
 	}
 	return client, nil
 }
@@ -81,3 +82,4 @@ func (r *repository) Delete(id int) error {
 	}
 	return nil
 }
+
