@@ -17,13 +17,13 @@ type Logger struct {
 func main() {
 	//opts := grpc.WithInsecure()
 	logger := hclog.Default()
-	logger.Info("Iniciando servicio en puerto 15011")
-	lis, err := net.Listen("tcp", ":15011")
+	logger.Info("Iniciando servicio en puerto 5011")
+	lis, err := net.Listen("tcp", ":5011")
 	if err != nil {
 		logger.Error("Failed to listen","error", err)
 	}
 	logger.Info("Configurando servicios...")
-	repository := gorm.NewClientsRepository("207.244.255.63", "clientsvc", "UJd2XhJ0XDQWgngc", "erp_client", "America/La_Paz", 5432)
+	repository := gorm.NewClientsRepository("localhost", "clientsvc", "UJd2XhJ0XDQWgngc", "erp_client", "America/La_Paz", 5432)
 	service := clientssrv.NewService(repository)
 	srv := server.NewServer(service, logger)
 	gserver := grpc.NewServer()
