@@ -64,30 +64,30 @@ func (cc *ClientCli) parseToClient(clientGrpc *proto.Client) *domain.Client {
 	}
 }
 
-func (cc *ClientCli) listToGrpc(clients []*domain.Client) []*proto.Client {
-	var listClientGrpc []*proto.Client
+func (cc *ClientCli) listToGrpc(clients []*domain.Client) []proto.Client {
+	var listClientGrpc []proto.Client
 	for _, client := range clients {
-		listClientGrpc = append(listClientGrpc, cc.parseToGRPC(client))
+		listClientGrpc = append(listClientGrpc, *cc.parseToGRPC(client))
 	}
 	return listClientGrpc
 }
 
-func (cc *ClientCli) listToClient(clientsGrpc []*proto.Client) []*domain.Client {
-	var listClient []*domain.Client
+func (cc *ClientCli) listToClient(clientsGrpc []*proto.Client) []domain.Client {
+	var listClient []domain.Client
 	for _, clientGrpc := range clientsGrpc {
-		listClient = append(listClient, cc.parseToClient(clientGrpc))
+		listClient = append(listClient, *cc.parseToClient(clientGrpc))
 	}
 	return listClient
 }
 
-func (cc *ClientCli) GetClient(id int) (*domain.Client, error) {
+func (cc *ClientCli) GetClient(id int) (domain.Client, error) {
 	req := &proto.IdRequest{Id: uint32(id)}
 	res, err := cc.client.Get(context.Background(), req)
 	if err != nil {
 		cc.logger.Error("Ha ocurrido un error al obtener el cliente", "err", err)
-		return nil, err
+		return domain.Client{}, err
 	}
-	return cc.parseToClient(res.GetClient()), nil
+	return *cc.parseToClient(res.GetClient()), nil
 }
 
 func (cc *ClientCli) CreateClient(client *domain.Client, password string) error {
@@ -103,7 +103,7 @@ func (cc *ClientCli) CreateClient(client *domain.Client, password string) error 
 	return nil
 }
 
-func (cc *ClientCli) ListClients() ([]*domain.Client, error) {
+func (cc *ClientCli) ListClients() ([]domain.Client, error) {
 	req := &proto.ClientNilRequest{}
 	resp, err := cc.client.List(context.Background(), req)
 	if err != nil {

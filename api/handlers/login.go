@@ -56,6 +56,8 @@ func (lh *login) loginClient(c *fiber.Ctx)  {
 	_, user, errLogin := connection.Login(login.Email, login.Password)
 	if errLogin != nil {
 		lh.l.Error("Login: Datos incorrectos", "error", errLogin)
+		c.JSON(fiber.Map{"status":"failed", "message":"Algo salió mal..." })
+		return
 	}
 	usr := &usuario{
 		ID:        int(user.ID),

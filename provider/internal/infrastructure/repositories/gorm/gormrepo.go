@@ -31,21 +31,21 @@ func NewProvidersRepository(ip, user, password, dbname, tmz string, port int) *r
 }
 
 func (r *repository) Get(id int) (*domain.Provider, error) {
-	var provider *domain.Provider
-	proveedor := r.DBConn.First(provider, id )
+	var provider domain.Provider
+	proveedor := r.DBConn.Find(&provider, id )
 	if proveedor.RecordNotFound() {
 		return nil, errors.New("Proveedor no encontrado")
 	}
-	return provider, nil
+	return &provider, nil
 }
 
 func (r *repository) GetByEmail(email string) (*domain.Provider, error) {
-	var provider *domain.Provider
-	proveedor := r.DBConn.First(provider, &domain.Provider{Email: email} )
+	var provider domain.Provider
+	proveedor := r.DBConn.Find(&provider, &domain.Provider{Email: email} )
 	if proveedor.RecordNotFound() {
 		return nil, errors.New("Email no registrado.")
 	}
-	return provider, nil
+	return &provider, nil
 }
 
 func (r *repository) List() ([]*domain.Provider, error) {

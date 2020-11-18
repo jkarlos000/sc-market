@@ -64,30 +64,30 @@ func (pc *ProviderClient) parseToProvider(providerGrpc *proto.Provider) *domain.
 	}
 }
 
-func (pc *ProviderClient) listToGrpc(providers []*domain.Provider) []*proto.Provider {
-	var listProviderGrpc []*proto.Provider
+func (pc *ProviderClient) listToGrpc(providers []*domain.Provider) []proto.Provider {
+	var listProviderGrpc []proto.Provider
 	for _, provider := range providers {
-		listProviderGrpc = append(listProviderGrpc, pc.parseToGRPC(provider))
+		listProviderGrpc = append(listProviderGrpc, *pc.parseToGRPC(provider))
 	}
 	return listProviderGrpc
 }
 
-func (pc *ProviderClient) listToProvider(providersGrpc []*proto.Provider) []*domain.Provider {
-	var listProvider []*domain.Provider
+func (pc *ProviderClient) listToProvider(providersGrpc []*proto.Provider) []domain.Provider {
+	var listProvider []domain.Provider
 	for _, providerGrpc := range providersGrpc {
-		listProvider = append(listProvider, pc.parseToProvider(providerGrpc))
+		listProvider = append(listProvider, *pc.parseToProvider(providerGrpc))
 	}
 	return listProvider
 }
 
-func (pc *ProviderClient) GetProvider(id int) (*domain.Provider, error) {
+func (pc *ProviderClient) GetProvider(id int) (domain.Provider, error) {
 	req := &proto.IdRequest{Id: uint32(id)}
 	res, err := pc.client.Get(context.Background(), req)
 	if err != nil {
 		pc.logger.Error("Ha ocurrido un error al obtener el proveedor", "err", err)
-		return nil, err
+		return domain.Provider{}, err
 	}
-	return pc.parseToProvider(res.GetProvider()), nil
+	return *pc.parseToProvider(res.GetProvider()), nil
 }
 
 func (pc *ProviderClient) CreateProvider(provider *domain.Provider, password string) error {
@@ -103,7 +103,7 @@ func (pc *ProviderClient) CreateProvider(provider *domain.Provider, password str
 	return nil
 }
 
-func (pc *ProviderClient) ListProviders() ([]*domain.Provider, error) {
+func (pc *ProviderClient) ListProviders() ([]domain.Provider, error) {
 	req := &proto.ProviderNilRequest{}
 	resp, err := pc.client.List(context.Background(), req)
 	if err != nil {
@@ -150,7 +150,7 @@ func (pc *ProviderClient) UpdateProvider(id int, provider *domain.Provider) erro
 	return nil
 }
 
-func (pc *ProviderClient) Login(email, password string) (bool, *domain.Provider, error) {
+func (pc *ProviderClient) Login(email, password string) (bool, domain.Provider, error) {
 	req := &proto.LoginRequest{
 		Email:    email,
 		Password: password,
@@ -158,9 +158,9 @@ func (pc *ProviderClient) Login(email, password string) (bool, *domain.Provider,
 	resp, err := pc.client.Login(context.Background(), req)
 	if err != nil {
 		pc.logger.Error("Ha ocurrido un error con el Login", "err", err)
-		return false, nil, err
+		return false, domain.Provider{}, err
 	}
-	return resp.GetOk(), pc.parseToProvider(resp.GetProvider()), nil
+	return resp.GetOk(), *pc.parseToProvider(resp.GetProvider()), nil
 }
 
 func (pc *ProviderClient) BanProvider(id int) error {

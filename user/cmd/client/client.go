@@ -64,30 +64,30 @@ func (uc *UserClient) parseToUser(userGrpc *proto.User) *domain.User {
 	}
 }
 
-func (uc *UserClient) listToGrpc(users []*domain.User) []*proto.User {
-	var listUserGrpc []*proto.User
+func (uc *UserClient) listToGrpc(users []*domain.User) []proto.User {
+	var listUserGrpc []proto.User
 	for _, user := range users {
-		listUserGrpc = append(listUserGrpc, uc.parseToGRPC(user))
+		listUserGrpc = append(listUserGrpc, *uc.parseToGRPC(user))
 	}
 	return listUserGrpc
 }
 
-func (uc *UserClient) listToUser(usersGrpc []*proto.User) []*domain.User {
-	var listUser []*domain.User
+func (uc *UserClient) listToUser(usersGrpc []*proto.User) []domain.User {
+	var listUser []domain.User
 	for _, userGrpc := range usersGrpc {
-		listUser = append(listUser, uc.parseToUser(userGrpc))
+		listUser = append(listUser, *uc.parseToUser(userGrpc))
 	}
 	return listUser
 }
 
-func (uc *UserClient) GetUser(id int) (*domain.User, error) {
+func (uc *UserClient) GetUser(id int) (domain.User, error) {
 	req := &proto.IdRequest{Id: uint32(id)}
 	res, err := uc.client.Get(context.Background(), req)
 	if err != nil {
 		uc.logger.Error("Ha ocurrido un error al obtener el usuario", "err", err)
-		return nil, err
+		return domain.User{}, err
 	}
-	return uc.parseToUser(res.GetUser()), nil
+	return *uc.parseToUser(res.GetUser()), nil
 }
 
 func (uc *UserClient) CreateUser(user *domain.User, password string) error {
@@ -103,7 +103,7 @@ func (uc *UserClient) CreateUser(user *domain.User, password string) error {
 	return nil
 }
 
-func (uc *UserClient) ListUsers() ([]*domain.User, error) {
+func (uc *UserClient) ListUsers() ([]domain.User, error) {
 	req := &proto.UserNilRequest{}
 	resp, err := uc.client.List(context.Background(), req)
 	if err != nil {
@@ -150,7 +150,7 @@ func (uc *UserClient) UpdateUser(id int, user *domain.User) error {
 	return nil
 }
 
-func (uc *UserClient) Login(email, password string) (bool, *domain.User, error) {
+func (uc *UserClient) Login(email, password string) (bool, domain.User, error) {
 	req := &proto.LoginRequest{
 		Email:    email,
 		Password: password,
@@ -158,9 +158,9 @@ func (uc *UserClient) Login(email, password string) (bool, *domain.User, error) 
 	resp, err := uc.client.Login(context.Background(), req)
 	if err != nil {
 		uc.logger.Error("Ha ocurrido un error con el Login", "err", err)
-		return false, nil, err
+		return false, domain.User{}, err
 	}
-	return resp.GetOk(), uc.parseToUser(resp.GetUser()), nil
+	return resp.GetOk(), *uc.parseToUser(resp.GetUser()), nil
 }
 
 func (uc *UserClient) BanUser(id int) error {
